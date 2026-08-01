@@ -1,0 +1,42 @@
+{
+  "course": "build-password-hasher",
+  "language": "python",
+  "language_id": 71,
+  "entrypoint": "main.py",
+  "version": 1,
+  "content_hash": "9b3b6a265e2f8403",
+  "lessons": [
+    {
+      "slug": "why-hash",
+      "tests_hash": "6c0c9244ad05"
+    },
+    {
+      "slug": "salts",
+      "tests_hash": "e1ccdbc2c56d"
+    },
+    {
+      "slug": "pbkdf2",
+      "tests_hash": "d8ce20973248"
+    },
+    {
+      "slug": "bcrypt",
+      "tests_hash": "d79edce022e8"
+    },
+    {
+      "slug": "argon2",
+      "tests_hash": "e0823cf8977d"
+    },
+    {
+      "slug": "verification",
+      "tests_hash": "228dffe57b66"
+    },
+    {
+      "slug": "rehash",
+      "tests_hash": "a61a2f2d754f"
+    },
+    {
+      "slug": "full-pw",
+      "tests_hash": "650135f9051f"
+    }
+  ]
+}

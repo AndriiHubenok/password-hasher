@@ -1,0 +1,5 @@
+REGISTER carol secret1
+CHANGE carol wrongold secret2
+LOGIN carol secret1
+CHANGE carol secret1 secret2
+LOGIN carol secret2

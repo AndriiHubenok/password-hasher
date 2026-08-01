@@ -1,0 +1,10 @@
+REGISTER alice hunter2
+LOGIN alice hunter2
+LOGIN alice wrongpass
+CHANGE alice hunter2 newpass123
+LOGIN alice hunter2
+LOGIN alice newpass123
+LIST
+REGISTER bob pw123
+LIST
+REGISTER alice again
