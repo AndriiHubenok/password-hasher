@@ -1,20 +1,26 @@
 import sys
 
-def classify_scheme(line: str) -> str:
-    safe_kdfs = ['bcrypt', 'argon2', 'scrypt', 'pbkdf2']
+seed = 0
 
-    if any(kdf in line for kdf in safe_kdfs):
-        return "SAFE"
+def generate_salt(length):
+    global seed
+    salt_bytes = bytearray()
+    for _ in range(length):
 
-    if "iter" in line:
-        return "SAFE"
+        seed = (seed * 1103515245 + 12345) % (2**31)
+        low_byte = seed & 0xFF
+        salt_bytes.append(low_byte)
 
-    return "VULNERABLE"
+    return salt_bytes.hex()
 
 for raw in sys.stdin:
-    line = raw.strip().lower()
+    line = raw.rstrip("\n")
     if not line:
         continue
 
-    result = classify_scheme(line)
-    print(result)
+    args = line.split()
+
+    if args[0] == "SEED":
+        seed = int(args[1])
+    elif args[0] == "SALT":
+        print(generate_salt(int(args[1])))
