@@ -1,8 +1,10 @@
+import hashlib
+import hmac
 import sys
 
 seed = 0
 
-def generate_salt(length):
+def generate_salt(length: int):
     global seed
     salt_bytes = bytearray()
     for _ in range(length):
@@ -13,6 +15,23 @@ def generate_salt(length):
 
     return salt_bytes.hex()
 
+def generate_hash(password: str, salt_hex: str, iterations: int, dklen=32):
+    password_bytes = password.encode('utf-8')
+    salt_bytes = bytes.fromhex(salt_hex)
+
+    block_index = (1).to_bytes(4, byteorder='big')
+
+    u = hmac.new(password_bytes, salt_bytes + block_index, hashlib.sha256).digest()
+
+    t = u
+
+    for _ in range(1, iterations):
+        u = hmac.new(password_bytes, u, hashlib.sha256).digest()
+
+        t = bytes(a ^ b for a, b in zip(t, u))
+
+    return t.hex()
+
 for raw in sys.stdin:
     line = raw.rstrip("\n")
     if not line:
@@ -20,7 +39,6 @@ for raw in sys.stdin:
 
     args = line.split()
 
-    if args[0] == "SEED":
-        seed = int(args[1])
-    elif args[0] == "SALT":
-        print(generate_salt(int(args[1])))
+    if args[0] == "HASH":
+        inputs = args[1].split("|")
+        print(generate_hash(inputs[0], inputs[1], int(inputs[2])))
