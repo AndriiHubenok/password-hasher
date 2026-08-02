@@ -89,12 +89,25 @@ def parse_argon2_format(line: str):
 
     return "variant={} {} {} {} {}".format(variant, v, m, t, p)
 
+def compare(a, b):
+    if len(a) != len(b): return False
+    result = 0
+
+    for x, y in zip(a, b):
+        result |= int(x) ^ int(y)
+    return result == 0
+
 for raw in sys.stdin:
     line = raw.rstrip("\n")
     if not line:
         continue
 
-    if line.startswith("$argon2"):
-        print(parse_argon2_format(line))
+    if line.startswith("CMP"):
+        args = line[4:].split("|")
+        result = compare(args[0], args[1])
+        if result:
+            print("EQUAL")
+        else:
+            print("DIFF")
     else:
         print("INVALID")
