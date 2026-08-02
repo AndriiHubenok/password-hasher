@@ -138,6 +138,10 @@ def change_password(username: str, old_password: str, new_password: str):
 def list_users():
     global users
 
+    if not users:
+        print("EMPTY")
+        return
+
     result = ""
     for user in users.keys():
         result += user + ","
