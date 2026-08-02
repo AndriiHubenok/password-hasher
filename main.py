@@ -58,13 +58,43 @@ def parse_bcrypt_format(line: str):
 
     return "version={} cost={} salt={} hash={}".format(version, cost, salt, h)
 
+def parse_argon2_format(line: str):
+    args = line[7:].split("$")
+    variant = args[0]
+    v = args[1]
+    params = args[2].split(",")
+    m = params[0]
+    t = params[1]
+    p = params[2]
+
+    match = re.search(r"^[id]*$", variant)
+    if not match:
+        return "INVALID"
+
+    match = re.search(r"^v=\d{2}$", v)
+    if not match:
+        return "INVALID"
+
+    match = re.search(r"^m=(\d+)$", m)
+    if not match:
+        return "INVALID"
+
+    match = re.search(r"^t=\d$", t)
+    if not match:
+        return "INVALID"
+
+    match = re.search(r"^p=\d$", p)
+    if not match:
+        return "INVALID"
+
+    return "variant={} {} {} {} {}".format(variant, v, m, t, p)
 
 for raw in sys.stdin:
     line = raw.rstrip("\n")
     if not line:
         continue
 
-    if line.startswith("$"):
-        print(parse_bcrypt_format(line))
+    if line.startswith("$argon2"):
+        print(parse_argon2_format(line))
     else:
         print("INVALID")
