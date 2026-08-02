@@ -63,7 +63,7 @@ def check_rehash(line: str):
     global cost
     current_cost = int(line[1:].split("$")[1])
 
-    if cost > current_cost:
+    if cost < current_cost:
         return True
 
     return False
