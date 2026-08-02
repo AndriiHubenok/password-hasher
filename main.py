@@ -5,6 +5,7 @@ import re
 
 seed = 0
 cost = 0
+users = {}
 
 def generate_salt(length: int):
     global seed
@@ -105,20 +106,75 @@ def compare(a, b):
     result = 0
 
     for x, y in zip(a, b):
-        result |= int(x) ^ int(y)
+        result |= ord(x) ^ ord(y)
     return result == 0
+
+def register_user(username: str, password: str):
+    global users
+    if username in users:
+        return False
+
+    users[username] = "bcrypt$" + password
+    return True
+
+def login(username: str, password: str):
+    global users
+    if username in users:
+        hashed_password = "bcrypt$" + password
+        return compare(users[username], hashed_password)
+
+    return False
+
+def change_password(username: str, old_password: str, new_password: str):
+    global users
+    is_valid = login(username, old_password)
+
+    if is_valid:
+        users[username] = "bcrypt$" + new_password
+        return True
+
+    return False
+
+def list_users():
+    global users
+
+    result = ""
+    for user in users.keys():
+        result += user + ","
+
+    print(result[:-1])
 
 for raw in sys.stdin:
     line = raw.rstrip("\n")
     if not line:
         continue
 
-    if line.startswith("TARGET"):
-        c = int(line[12:])
-        cost = c
-    elif line.startswith("LOGIN"):
-        result = check_rehash(line[6:])
+    if line.startswith("REGISTER"):
+        args = line[9:].split()
+        result = register_user(args[0], args[1])
+
         if result:
-            print("OK rehash=true")
+            print("OK")
         else:
-            print("OK rehash=false")
+            print("EXISTS")
+
+    elif line.startswith("LOGIN"):
+        args = line[6:].split()
+        result = login(args[0], args[1])
+
+        if result:
+            print("OK")
+        else:
+            print("BAD")
+
+    elif line.startswith("CHANGE"):
+        args = line[7:].split()
+        result = change_password(args[0], args[1], args[2])
+
+        if result:
+            print("OK")
+        else:
+            print("BAD")
+
+    elif line.startswith("LIST"):
+        list_users()
