@@ -1,6 +1,7 @@
 import hashlib
 import hmac
 import sys
+import re
 
 seed = 0
 
@@ -32,13 +33,38 @@ def generate_hash(password: str, salt_hex: str, iterations: int, dklen=32):
 
     return t.hex()
 
+def parse_bcrypt_format(line: str):
+    args = line[1:].split("$")
+    version = args[0]
+    cost = args[1]
+    salt = args[2][:22]
+    h = args[2][22:]
+
+    match = re.search(r"^2[ab]*$", version)
+    if not match:
+        return "INVALID"
+
+    match = re.search(r"^\d{2}$", cost)
+    if not match:
+        return "INVALID"
+
+    match = re.search(r"^[./A-Za-z0-9]{22}$", salt)
+    if not match:
+        return "INVALID"
+
+    match = re.search(r"^[./A-Za-z0-9]{31}$", h)
+    if not match:
+        return "INVALID"
+
+    return "version={} cost={} salt={} hash={}".format(version, cost, salt, h)
+
+
 for raw in sys.stdin:
     line = raw.rstrip("\n")
     if not line:
         continue
 
-    args = line.split()
-
-    if args[0] == "HASH":
-        inputs = args[1].split("|")
-        print(generate_hash(inputs[0], inputs[1], int(inputs[2])))
+    if line.startswith("$"):
+        print(parse_bcrypt_format(line))
+    else:
+        print("INVALID")
